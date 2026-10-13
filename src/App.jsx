@@ -108,19 +108,23 @@ function DialoguePanel({ node, nodeId, displayedText, isTyping, onSkip, onChoose
         <p
           key={nodeId}
           onClick={isTyping ? onSkip : undefined}
-          className={`node-in mt-2 text-sm leading-relaxed text-green-400 select-text md:text-base ${nodeId === 'creditos_ia' ? 'whitespace-pre-line' : ''} ${isTyping ? 'cursor-pointer' : ''}`}
+          className={`node-in relative mt-2 text-sm leading-relaxed text-green-400 select-text md:text-base ${nodeId === 'creditos_ia' ? 'whitespace-pre-line' : ''} ${isTyping ? 'cursor-pointer' : ''}`}
         >
-          {displayedText}
-          {isTyping && <span className="terminal-caret" aria-hidden="true" />}
+          <span className="invisible select-none" aria-hidden="true">{node.text}</span>
+          <span className="absolute inset-0">
+            {displayedText}
+            {isTyping && <span className="terminal-caret" aria-hidden="true" />}
+          </span>
         </p>
         {!isTyping && (
-          <div className="node-in mt-3 flex flex-col gap-1.5">
-            {node.options.map((option) => (
+          <div className="mt-3 flex flex-col gap-1.5">
+            {node.options.map((option, index) => (
               <button
                 key={option.text}
                 type="button"
                 onClick={() => onChoose(option.nextNode)}
-                className="cursor-pointer border border-green-800 bg-black/70 px-3 py-2 text-left text-sm text-green-500 transition-all duration-200 hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-100 hover:shadow-[0_0_18px_rgba(34,211,238,0.35)]"
+                style={{ animationDelay: `${index * 80}ms` }}
+                className="option-in cursor-pointer border border-green-800 bg-black/70 px-3 py-2 text-left text-sm text-green-500 transition-colors duration-200 hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-100 hover:shadow-[0_0_18px_rgba(34,211,238,0.35)]"
               >
                 {'>'} {option.text}
               </button>
