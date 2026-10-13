@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { story } from './storyData'
 
 const CLOCK = {
+  intro_1: '--:--:--',
+  intro_2: '--:--:--',
+  intro_3: '--:--:--',
   prologo: '00:10:00',
   interrogar_v: '00:08:20',
   v_logica: '00:07:02',
@@ -14,9 +17,16 @@ const CLOCK = {
   final_error: '00:00:00',
   final_corporativo: '00:00:00',
   final_rebelion: '00:00:00',
+  creditos_ia: '00:00:00',
+}
+
+function isCinematic(nodeId) {
+  return nodeId.startsWith('intro_') || nodeId === 'creditos_ia'
 }
 
 function sceneLabel(nodeId) {
+  if (nodeId.startsWith('intro_')) return 'TRANSMISIÓN'
+  if (nodeId === 'creditos_ia') return 'INFORME'
   if (nodeId === 'climax_decision') return 'VEREDICTO'
   if (nodeId.startsWith('final_')) return 'CIERRE DE SESIÓN'
   if (nodeId === 'prologo') return 'OFICINA EJECUTIVA'
@@ -41,14 +51,16 @@ function Hud({ nodeId }) {
         <p className="text-[10px] tracking-[0.18em] text-green-500/70 sm:tracking-[0.28em]">{sceneLabel(nodeId)}</p>
         <p className="text-[10px] tracking-[0.18em] text-cyan-400/80 sm:tracking-[0.28em]">ACCESO OMEGA-4</p>
         <p className={`mt-1 text-sm tabular-nums md:text-base ${expired ? 'animate-pulse text-red-500' : 'text-cyan-400'}`}>
-          T-{clock}
+          {clock === '--:--:--' ? clock : `T-${clock}`}
         </p>
       </div>
     </header>
   )
 }
 
-function Stage({ node, spriteFailed, onSpriteError }) {
+function Stage({ node, nodeId, spriteFailed, onSpriteError }) {
+  const showVoice = !node.character && !isCinematic(nodeId)
+
   return (
     <div className="relative z-10 flex min-h-0 flex-1 items-end justify-center overflow-hidden px-4 pb-4 md:justify-end md:px-10">
       {node.character && !spriteFailed ? (
@@ -68,7 +80,7 @@ function Stage({ node, spriteFailed, onSpriteError }) {
           />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.18)_50%)] bg-[length:100%_4px] opacity-50" />
         </figure>
-      ) : (
+      ) : showVoice ? (
         <div
           key="voice"
           className="node-in mb-4 border border-cyan-400/50 bg-black/80 px-6 py-5 text-center shadow-[0_0_28px_rgba(34,211,238,0.25)]"
@@ -76,14 +88,14 @@ function Stage({ node, spriteFailed, onSpriteError }) {
           <p className="text-[10px] tracking-[0.35em] text-cyan-400">CANAL DE VOZ // SIN VIDEO</p>
           <p className="mt-2 text-sm tracking-[0.2em] text-green-500">AURICULAR SEGURO</p>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
 
-function DialoguePanel({ node, nodeId, onChoose }) {
+function DialoguePanel({ node, nodeId, displayedText, isTyping, onSkip, onChoose }) {
   return (
-    <section className="relative z-20 max-h-[58vh] overflow-y-auto border-t border-green-500/40 bg-black/85 px-4 py-3 terminal-scroll md:px-10">
+    <section className={`relative z-20 overflow-y-auto border-t border-green-500/40 bg-black/85 px-4 py-3 terminal-scroll md:px-10 ${nodeId === 'creditos_ia' ? 'max-h-[78vh]' : 'max-h-[58vh]'}`}>
       <div className="relative mx-auto max-w-5xl border border-green-500/30 bg-black/60 p-4 md:p-5">
         <span className="pointer-events-none absolute left-0 top-0 h-3 w-3 border-l-2 border-t-2 border-cyan-400" />
         <span className="pointer-events-none absolute right-0 top-0 h-3 w-3 border-r-2 border-t-2 border-cyan-400" />
@@ -95,22 +107,26 @@ function DialoguePanel({ node, nodeId, onChoose }) {
         </h2>
         <p
           key={nodeId}
-          className="node-in mt-2 text-sm leading-relaxed text-green-400 select-text md:text-base"
+          onClick={isTyping ? onSkip : undefined}
+          className={`node-in mt-2 text-sm leading-relaxed text-green-400 select-text md:text-base ${nodeId === 'creditos_ia' ? 'whitespace-pre-line' : ''} ${isTyping ? 'cursor-pointer' : ''}`}
         >
-          {node.text}
+          {displayedText}
+          {isTyping && <span className="terminal-caret" aria-hidden="true" />}
         </p>
-        <div className="mt-3 flex flex-col gap-1.5">
-          {node.options.map((option) => (
-            <button
-              key={option.text}
-              type="button"
-              onClick={() => onChoose(option.nextNode)}
-              className="cursor-pointer border border-green-800 bg-black/70 px-3 py-2 text-left text-sm text-green-500 transition-all duration-200 hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-100 hover:shadow-[0_0_18px_rgba(34,211,238,0.35)]"
-            >
-              {'>'} {option.text}
-            </button>
-          ))}
-        </div>
+        {!isTyping && (
+          <div className="node-in mt-3 flex flex-col gap-1.5">
+            {node.options.map((option) => (
+              <button
+                key={option.text}
+                type="button"
+                onClick={() => onChoose(option.nextNode)}
+                className="cursor-pointer border border-green-800 bg-black/70 px-3 py-2 text-left text-sm text-green-500 transition-all duration-200 hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-100 hover:shadow-[0_0_18px_rgba(34,211,238,0.35)]"
+              >
+                {'>'} {option.text}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )
@@ -125,18 +141,50 @@ function CrtOverlay() {
   )
 }
 
+const TYPE_DELAY_MS = 25
+
 export default function App() {
-  const [currentNode, setCurrentNode] = useState('prologo')
+  const [currentNode, setCurrentNode] = useState('intro_1')
   const [spriteFailed, setSpriteFailed] = useState(false)
+  const [displayedText, setDisplayedText] = useState('')
+  const [isTyping, setIsTyping] = useState(true)
+  const timerRef = useRef(null)
   const node = story[currentNode]
 
   useEffect(() => {
-    if (!story[currentNode]) setCurrentNode('prologo')
+    if (!story[currentNode]) setCurrentNode('intro_1')
   }, [currentNode])
 
   useEffect(() => {
     setSpriteFailed(false)
   }, [currentNode])
+
+  useEffect(() => {
+    const full = story[currentNode]?.text ?? ''
+    setDisplayedText('')
+    setIsTyping(true)
+    let index = 0
+
+    timerRef.current = setInterval(() => {
+      index += 1
+      if (index >= full.length) {
+        clearInterval(timerRef.current)
+        setDisplayedText(full)
+        setIsTyping(false)
+        return
+      }
+      setDisplayedText(full.slice(0, index))
+    }, TYPE_DELAY_MS)
+
+    return () => clearInterval(timerRef.current)
+  }, [currentNode])
+
+  function skipTyping() {
+    const full = story[currentNode]?.text ?? ''
+    clearInterval(timerRef.current)
+    setDisplayedText(full)
+    setIsTyping(false)
+  }
 
   if (!node) return null
 
@@ -150,8 +198,15 @@ export default function App() {
       <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/75 via-black/25 to-black/80" />
 
       <Hud nodeId={currentNode} />
-      <Stage node={node} spriteFailed={spriteFailed} onSpriteError={() => setSpriteFailed(true)} />
-      <DialoguePanel node={node} nodeId={currentNode} onChoose={setCurrentNode} />
+      <Stage node={node} nodeId={currentNode} spriteFailed={spriteFailed} onSpriteError={() => setSpriteFailed(true)} />
+      <DialoguePanel
+        node={node}
+        nodeId={currentNode}
+        displayedText={displayedText}
+        isTyping={isTyping}
+        onSkip={skipTyping}
+        onChoose={setCurrentNode}
+      />
       <CrtOverlay />
     </div>
   )

@@ -34,6 +34,17 @@
   animation: node-in 500ms ease;
 }
 
+.terminal-caret {
+  display: inline-block;
+  width: 0.7em;
+  height: 1.15em;
+  margin-left: 1px;
+  vertical-align: -0.18em;
+  background: #4ade80;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.95);
+  animation: caret-blink 1.1s steps(1) infinite;
+}
+
 .terminal-scroll {
   scrollbar-width: thin;
   scrollbar-color: rgba(34, 197, 94, 0.45) transparent;
@@ -45,6 +56,17 @@
 
 .terminal-scroll::-webkit-scrollbar-thumb {
   background: rgba(34, 197, 94, 0.45);
+}
+
+@keyframes caret-blink {
+  0%,
+  68% {
+    opacity: 1;
+  }
+  69%,
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes node-in {
