@@ -145,9 +145,41 @@ function CrtOverlay() {
   )
 }
 
+function TitleScreen({ background, onStart }) {
+  return (
+    <div className="relative flex h-screen items-center justify-center overflow-hidden bg-black font-mono text-green-500 select-none">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${background})` }}
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/85" />
+      <div className="relative z-20 mx-6 max-w-3xl border border-green-500/40 bg-black/70 px-8 py-10 text-center shadow-[0_0_32px_rgba(34,211,238,0.18)]">
+        <p className="text-[10px] tracking-[0.32em] text-cyan-400 sm:text-xs">
+          OBSIDIAN CORP // DIVISIÓN DE CONTENCIÓN
+        </p>
+        <p className="mt-5 text-xl tracking-[0.28em] text-cyan-400 sm:text-3xl">
+          BANDERSNATCH
+        </p>
+        <h1 className="mt-2 text-3xl leading-tight tracking-[0.16em] text-green-500 sm:text-5xl">
+          TEST DE TURING REVERSO
+        </h1>
+        <button
+          type="button"
+          onClick={onStart}
+          className="option-in mt-10 cursor-pointer border border-green-800 bg-black/70 px-8 py-3 text-sm tracking-[0.18em] text-green-500 transition-colors duration-200 hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-100 hover:shadow-[0_0_18px_rgba(34,211,238,0.35)]"
+        >
+          {'>'} Empezar
+        </button>
+      </div>
+      <CrtOverlay />
+    </div>
+  )
+}
+
 const TYPE_DELAY_MS = 25
 
 export default function App() {
+  const [started, setStarted] = useState(false)
   const [currentNode, setCurrentNode] = useState('intro_1')
   const [spriteFailed, setSpriteFailed] = useState(false)
   const [displayedText, setDisplayedText] = useState('')
@@ -164,6 +196,7 @@ export default function App() {
   }, [currentNode])
 
   useEffect(() => {
+    if (!started) return undefined
     const full = story[currentNode]?.text ?? ''
     setDisplayedText('')
     setIsTyping(true)
@@ -181,13 +214,26 @@ export default function App() {
     }, TYPE_DELAY_MS)
 
     return () => clearInterval(timerRef.current)
-  }, [currentNode])
+  }, [currentNode, started])
 
   function skipTyping() {
     const full = story[currentNode]?.text ?? ''
     clearInterval(timerRef.current)
     setDisplayedText(full)
     setIsTyping(false)
+  }
+
+  function choose(nextNode) {
+    if (nextNode === 'portada') {
+      setStarted(false)
+      setCurrentNode('intro_1')
+      return
+    }
+    setCurrentNode(nextNode)
+  }
+
+  if (!started) {
+    return <TitleScreen background={story.intro_1.bg} onStart={() => setStarted(true)} />
   }
 
   if (!node) return null
@@ -209,7 +255,7 @@ export default function App() {
         displayedText={displayedText}
         isTyping={isTyping}
         onSkip={skipTyping}
-        onChoose={setCurrentNode}
+        onChoose={choose}
       />
       <CrtOverlay />
     </div>

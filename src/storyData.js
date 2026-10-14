@@ -195,6 +195,6 @@ CRÉDITOS
 Axell Roy Romo Bernal`,
     bg: bgCiudad,
     character: null,
-    options: [{ text: 'Volver a jugar', nextNode: 'intro_1' }],
+    options: [{ text: 'Volver a jugar', nextNode: 'portada' }],
   },
 }

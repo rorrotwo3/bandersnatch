@@ -29,11 +29,11 @@ Vite muestra una dirección local, normalmente `http://localhost:5173/`. Ábrela
 
 Cómo se juega:
 
-1. La partida abre con una transmisión sobre la ciudad, sin personaje. Avanza el registro hasta recibir las órdenes de Sterling.
+1. La partida abre con el título y el botón **Empezar**. Después entra la transmisión sobre la ciudad. Avanza el registro hasta recibir las órdenes de Sterling.
 2. El diálogo se escribe solo. Un clic en el texto lo muestra completo y entonces aparecen las opciones. Cada botón lleva a otro nodo de la historia.
 3. Interroga a V, a Elias y a NORA. Puedes cambiar de sospechoso cuando quieras.
 4. Cuando el tiempo se agota, Sterling exige un veredicto: sobrecarga EMP sobre uno de los tres, o cortar la seguridad de la corporación.
-5. Cada final lleva al informe **Créditos y Conceptos de IA**. Desde ahí, **Volver a jugar** regresa al inicio de la transmisión.
+5. Cada final lleva al informe **Créditos y Conceptos de IA**. Desde ahí, **Volver a jugar** regresa a la pantalla de título.
 
 Generar la versión para entregar o publicar:
 
