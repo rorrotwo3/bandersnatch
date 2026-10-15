@@ -4,6 +4,8 @@ Novela visual en el navegador, al estilo Bandersnatch. El jugador es un auditor 
 
 Autor: Axell Roy Romo Bernal.
 
+Se puede jugar sin instalar nada, en el despliegue de Vercel: [https://bandersnatch-swart.vercel.app/](https://bandersnatch-swart.vercel.app/)
+
 ## Requisitos
 
 - Node.js 20 o superior
